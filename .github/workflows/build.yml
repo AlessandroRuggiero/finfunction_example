@@ -1,0 +1,34 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: install exitism builder
+      run: curl -Ls https://raw.githubusercontent.com/extism/python-pdk/main/install.sh | bash
+
+    - name: Build
+      run: extism-py finfunc.py -o finfunc.wasm
+    
+    - name: Upload Function
+      uses: actions/upload-artifact@v4
+      with:
+        name: finfunc.wasm
+        path: finfunc.wasm
