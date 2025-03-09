@@ -21,14 +21,21 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: install exitism builder
+    - name: Install Extism Builder
       run: curl -Ls https://raw.githubusercontent.com/extism/python-pdk/main/install.sh | bash
 
     - name: Build
       run: extism-py finfunc.py -o finfunc.wasm
-    
-    - name: Upload Function
-      uses: actions/upload-artifact@v4
+
+    # Only run this step on main branch pushes (not PRs)
+    - name: Create GitHub Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v1
       with:
-        name: finfunc.wasm
-        path: finfunc.wasm
+        tag_name: v1.0.${{ github.run_number }}
+        name: Release v1.0.${{ github.run_number }}
+        draft: false
+        prerelease: false
+        files: finfunc.wasm
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
